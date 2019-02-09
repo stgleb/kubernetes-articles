@@ -24,7 +24,8 @@ kubeadm join <master-ip>:<master-port> --token <bootstrap-token> --discovery-tok
 
 CA cert can be found on master node in `/etc/kubernetes/pki/ca.crt` by default.
 
-Download kubelet and kubectl binaries from [here](https://kubernetes.io/docs/setup/release/notes/#server-binaries).
+To bootstrap node we need only two binaries - kubectl and kubelet
+Download those binaries from [here](https://kubernetes.io/docs/setup/release/notes/#server-binaries).
 Don't forget to install docker
 
 ```
@@ -32,12 +33,6 @@ apt-get update
 apt install -y docker.io
 ```
 
-Create folder for certs `/etc/kubernets/pki` and put ca.crt the
-For doing TLS bootstrap kubelet requires a few things
-
-1. Path to kubeconfig that doesnt exist and will be stored there
-   after successfull bootstrap `--kubeconfig`
-2. A path to bootstrap config `--bootstrap-kubeconfig`
 
 Create a folder that will store kubernetes related files
 
@@ -46,6 +41,13 @@ mkdir /etc/kubernetes
 mkdir /etc/kubernetes/manifest
 mkdir /etc/kubernetes/pki
 ```
+
+Put ca.crt from master to /etc/kubernetes/pki
+For doing TLS bootstrap kubelet requires a few things
+
+1. Path to kubeconfig that doesnt exist and will be stored there
+   after successfull bootstrap `--kubeconfig`
+2. A path to bootstrap config `--bootstrap-kubeconfig`
 
 To get correct bootstrap config file we will use `kubectl config` command
 
