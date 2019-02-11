@@ -25,7 +25,15 @@ kubeadm join <master-ip>:<master-port> --token <bootstrap-token> --discovery-tok
 CA cert can be found on master node in `/etc/kubernetes/pki/ca.crt` by default.
 
 To bootstrap node we need only two binaries - kubectl and kubelet
-Download those binaries from [here](https://kubernetes.io/docs/setup/release/notes/#server-binaries).
+Download those binaries from [here](https://kubernetes.io/docs/setup/release/notes/#server-binaries). And unpack them
+
+```
+wget https://dl.k8s.io/v1.13.0/kubernetes-server-linux-amd64.tar.gz
+tar -xvf kubernetes-server-linux-amd64.tar.gz
+cp kubernetes/server/bin/kubelet
+cp kubernetes/server/bin/kubectl
+```
+
 Don't forget to install docker
 
 ```
