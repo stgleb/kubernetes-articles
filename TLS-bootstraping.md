@@ -91,3 +91,11 @@ systemctl daemon-reload
 systemctl start kubelet
 systemctl enable kubelet
 ```
+
+
+References:
+
+   https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/
+   https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/
+   https://medium.com/@toddrosner/kubernetes-tls-bootstrapping-cf203776abc7
+   
