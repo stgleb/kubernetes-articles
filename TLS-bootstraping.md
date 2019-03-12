@@ -30,8 +30,8 @@ Download those binaries from [here](https://kubernetes.io/docs/setup/release/not
 ```
 wget https://dl.k8s.io/v1.13.0/kubernetes-server-linux-amd64.tar.gz
 tar -xvf kubernetes-server-linux-amd64.tar.gz
-cp kubernetes/server/bin/kubelet
-cp kubernetes/server/bin/kubectl
+cp kubernetes/server/bin/kubelet /usr/bin
+cp kubernetes/server/bin/kubectl /usr/bin
 ```
 
 Don't forget to install docker
@@ -57,28 +57,34 @@ For doing TLS bootstrap kubelet requires a few things
    after successfull bootstrap `--kubeconfig`
 2. A path to bootstrap config `--bootstrap-kubeconfig`
 
-To get correct bootstrap config file we will use `kubectl config` command
+We can either craft bootstrap config manually using `kubectl config` command
+or just copy kubeconfig from master node.
 
 ```
-./kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-cluster kubernetes --server='https://<master-host>:<master-port>' --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true
+kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-cluster kubernetes --server='https://<master-host>:<master-port>' --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true
 
-./kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-credentials tls-bootstrap-token-user --token=<bootstrap-token>
+kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-credentials tls-bootstrap-token-user --token=<bootstrap-token>
 
-./kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-context tls-bootstrap-token-user@kubernetes --user=tls-bootstrap-token-user --cluster=kubernetes
+kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-context tls-bootstrap-token-user@kubernetes --user=tls-bootstrap-token-user --cluster=kubernetes
 
-./kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig use-context tls-bootstrap-token-user@kubernetes
+kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig use-context tls-bootstrap-token-user@kubernetes
 
 ```
 
 
 The last step we need to do - create systemd
 file in `/etc/systemd/system/kubelet.service` to run kubelet
-
+We enable client certificate rotation which is in Beta right now to
+make kubelet update certificate each time it is going to expire.
 
 ```
 [Service]
-Restart=Always
-ExecStart=/root/kubelet --kubeconfig=/etc/kubernetes/kubeconfig --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubeconfig --pod-manifest-path=/etc/kubernetes/manifest
+Restart=always
+ExecStart=/root/kubelet --kubeconfig=/etc/kubernetes/kubeconfig \ 
+--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubeconfig \ 
+--pod-manifest-path=/etc/kubernetes/manifest \
+--feature-gates=RotateKubeletClientCertificate=true \
+--rotate-certificates
 
 [Install]
 WantedBy=multi-user.target
@@ -88,14 +94,15 @@ Then reload systemd daemon and enable kubelet service to run on start
 
 ```
 systemctl daemon-reload
-systemctl start kubelet
 systemctl enable kubelet
+systemctl start kubelet
 ```
 
 
 References:
 
    https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/
+   https://kubernetes.io/docs/tasks/tls/certificate-rotation/
+   https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
    https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/
    https://medium.com/@toddrosner/kubernetes-tls-bootstrapping-cf203776abc7
-   
