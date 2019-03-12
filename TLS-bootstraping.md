@@ -28,26 +28,26 @@ To bootstrap node we need only two binaries - kubectl and kubelet
 Download those binaries from [here](https://kubernetes.io/docs/setup/release/notes/#server-binaries). And unpack them
 
 ```
-wget https://dl.k8s.io/v1.13.0/kubernetes-server-linux-amd64.tar.gz
+wget https://dl.k8s.io/v1.13.4/kubernetes-server-linux-amd64.tar.gz
 tar -xvf kubernetes-server-linux-amd64.tar.gz
-cp kubernetes/server/bin/kubelet /usr/bin
-cp kubernetes/server/bin/kubectl /usr/bin
+sudo cp kubernetes/server/bin/kubelet /usr/bin
+sudo cp kubernetes/server/bin/kubectl /usr/bin
 ```
 
 Don't forget to install docker
 
 ```
-apt-get update
-apt install -y docker.io
+sudo apt-get update
+sudo apt install -y docker.io
 ```
 
 
 Create a folder that will store kubernetes related files
 
 ```
-mkdir /etc/kubernetes
-mkdir /etc/kubernetes/manifest
-mkdir /etc/kubernetes/pki
+sudo mkdir /etc/kubernetes
+sudo mkdir /etc/kubernetes/manifests
+sudo mkdir /etc/kubernetes/pki
 ```
 
 Put ca.crt from master to /etc/kubernetes/pki
@@ -80,11 +80,7 @@ make kubelet update certificate each time it is going to expire.
 ```
 [Service]
 Restart=always
-ExecStart=/root/kubelet --kubeconfig=/etc/kubernetes/kubeconfig \ 
---bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubeconfig \ 
---pod-manifest-path=/etc/kubernetes/manifest \
---feature-gates=RotateKubeletClientCertificate=true \
---rotate-certificates
+ExecStart=/usr/bin/kubelet --kubeconfig=/etc/kubernetes/kubeconfig --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubeconfig --pod-manifest-path=/etc/kubernetes/manifests --feature-gates=RotateKubeletClientCertificate=true --rotate-certificates
 
 [Install]
 WantedBy=multi-user.target
@@ -98,9 +94,19 @@ systemctl enable kubelet
 systemctl start kubelet
 ```
 
+Finally check that node is up and running in Ready state
+
+```
+kubectl get  no
+
+NAME         STATUS   ROLES    AGE   VERSION
+instance-1   Ready    master   15m   v1.13.4
+instance-2   Ready    <none>   30s   v1.13.4
+```
 
 References:
-
+   https://kubernetes.io/docs/setup/independent/install-kubeadm/
+   https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
    https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/
    https://kubernetes.io/docs/tasks/tls/certificate-rotation/
    https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
