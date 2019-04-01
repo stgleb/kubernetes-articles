@@ -61,13 +61,13 @@ We can either craft bootstrap config manually using `kubectl config` command
 or just copy kubeconfig from master node.
 
 ```
-kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-cluster kubernetes --server='https://<master-host>:<master-port>' --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true
+sudo kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-cluster kubernetes --server='https://<master-host>:<master-port>' --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true
 
-kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-credentials tls-bootstrap-token-user --token=<bootstrap-token>
+sudo kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-credentials tls-bootstrap-token-user --token=<bootstrap-token>
 
-kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-context tls-bootstrap-token-user@kubernetes --user=tls-bootstrap-token-user --cluster=kubernetes
+sudo kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig set-context tls-bootstrap-token-user@kubernetes --user=tls-bootstrap-token-user --cluster=kubernetes
 
-kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig use-context tls-bootstrap-token-user@kubernetes
+sudo kubectl config --kubeconfig=/etc/kubernetes/bootstrap-kubeconfig use-context tls-bootstrap-token-user@kubernetes
 
 ```
 
